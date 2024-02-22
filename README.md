@@ -14,10 +14,11 @@ This package eases the integration of [micro-ROS](https://micro.ros.org/) in a [
 
 ## Supported targets
 
-| Target     | `MICROROS_TARGET`  |
-| ---------- | ------------------ |
-| MicroBlaze | `VITIS_MICROBLAZE` |
-| Cortex R5  | `VITIS_CORTEX_R5`  |
+| Target             | `MICROROS_TARGET`     |
+| ------------------ | --------------------- |
+| MicroBlaze 32 bits | `VITIS_MICROBLAZE_32` |
+| MicroBlaze 64 bits | `VITIS_MICROBLAZE_64` |
+| Cortex R5          | `VITIS_CORTEX_R5`     |
 
 ## Prerequisites
 

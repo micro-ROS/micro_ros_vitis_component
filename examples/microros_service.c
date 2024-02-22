@@ -1,4 +1,7 @@
-#include <vitis_initialize_microros.h>
+#include <microros_vitis_support.h>
+
+#include <FreeRTOS.h>
+#include <task.h>
 
 #include <stdio.h>
 #include <rcl/rcl.h>
@@ -40,6 +43,7 @@ void microros_add_two_ints_service() {
         "/addtwoints"));
 
     // create executor
+    rclc_executor_t executor;
     RCCHECK(rclc_executor_init(&executor, &support.context, 1, &allocator));
 
     example_interfaces__srv__AddTwoInts_Response res;

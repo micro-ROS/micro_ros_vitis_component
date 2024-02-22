@@ -2,8 +2,10 @@
 
 # Depending on the MICROROS_TARGET environment variable, this script will build the micro-ROS library for the selected target.
 # The following targets are supported:
-# - VITIS_MICROBLAZE
+# - VITIS_MICROBLAZE_32
+# - VITIS_MICROBLAZE_64
 # - VITIS_CORTEX_R5
+# - GENERIC_ARM
 
 # Set compiler flags
 export MICROROS_FLAGS=""
@@ -15,16 +17,24 @@ if [ -z "${MICROROS_TARGET}" ]; then
 fi
 
 # Check if MICROROS_TARGET is supported
-if [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE" ] && [ "${MICROROS_TARGET}" != "VITIS_CORTEX_R5" ]; then
+if  [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE_32" ] &&
+    [ "${MICROROS_TARGET}" != "VITIS_CORTEX_R5" ] &&
+    [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE_64" ] &&
+    [ "${MICROROS_TARGET}" != "GENERIC_ARM" ]; then
     echo "MICROROS_TARGET ${MICROROS_TARGET} is not supported"
     exit
 fi
 
 # Set toolchain prefixes
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
     export TOOLCHAIN_PREFIX=mb-
+elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
+    export TOOLCHAIN_PREFIX=mb-
+    export MICROROS_FLAGS="${MICROROS_FLAGS} -m64"
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export TOOLCHAIN_PREFIX=armr5-none-eabi-
+elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
+    export TOOLCHAIN_PREFIX="arm-none-eabi-"
 fi
 
 # Define compilers
@@ -50,10 +60,14 @@ fi
 export MICRO_ROS_DISTRO=iron
 
 # Set toolchain prefixes
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
-    export MICRO_ROS_BUILD_DIR=microros_build_microblaze
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
+    export MICRO_ROS_BUILD_DIR=microros_build_microblaze_32
+elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
+    export MICRO_ROS_BUILD_DIR=microros_build_microblaze_64
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export MICRO_ROS_BUILD_DIR=microros_build_cortex_r5
+elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
+    export MICRO_ROS_BUILD_DIR=microros_build_generic_arm
 fi
 
 mkdir -p $MICRO_ROS_BUILD_DIR
@@ -82,7 +96,7 @@ fi
 if [ ! -d "$MICRO_ROS_BUILD_DIR/dev/install" ]; then
     # Install micro-ROS dev environment
     pushd $MICRO_ROS_BUILD_DIR/dev/ > /dev/null
-        colcon build ;
+        colcon build --event-handlers compile_commands- console_stderr-;
     popd > /dev/null
 fi
 
@@ -148,6 +162,7 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/install" ]; then
             --merge-install \
             --packages-ignore-regex=.*_cpp \
             --metas $COLCON_META \
+            --event-handlers compile_commands- console_stderr- \
             --cmake-args \
             "--no-warn-unused-cli" \
             -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=OFF \
@@ -167,17 +182,21 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/install" ]; then
             rm -rf ./install/include/${var}/${var}/ > /dev/null 2>&1
         done
 
-        # Delete all empty folder in install/include
+        # # Delete all empty folder in install/include
         find ./install/include -type d -empty -delete
 
     popd > /dev/null
 fi
 
 # Generate the output folder
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
-    export OUTPUT_FOLDER=microros_microblaze_lib
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
+    export OUTPUT_FOLDER=microros_microblaze_32_lib
+elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
+    export OUTPUT_FOLDER=microros_microblaze_64_lib
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export OUTPUT_FOLDER=microros_cortex_r5_lib
+elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
+    export OUTPUT_FOLDER=microros_generic_arm_lib
 fi
 
 rm -rf ${OUTPUT_FOLDER}
