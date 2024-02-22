@@ -1,3 +1,6 @@
+#include "FreeRTOS.h"
+#include "task.h"
+#include <time.h>
 
 #include <rmw_microros/rmw_microros.h>
 #include <rcl/rcl.h>
@@ -29,6 +32,51 @@ void * vitis_zero_allocate(size_t number_of_elements, size_t size_of_element, vo
     return calloc(number_of_elements, size_of_element);
 }
 
+// Clock handling
+#define MICROSECONDS_PER_SECOND    ( 1000000LL )                                   /**< Microseconds per second. */
+#define NANOSECONDS_PER_SECOND     ( 1000000000LL )                                /**< Nanoseconds per second. */
+#define NANOSECONDS_PER_TICK       ( NANOSECONDS_PER_SECOND / configTICK_RATE_HZ ) /**< Nanoseconds per FreeRTOS tick. */
+
+void UTILS_NanosecondsToTimespec( int64_t llSource,
+                                  struct timespec * const pxDestination )
+{
+    long lCarrySec = 0;
+
+    /* Convert to timespec. */
+    pxDestination->tv_sec = ( time_t ) ( llSource / NANOSECONDS_PER_SECOND );
+    pxDestination->tv_nsec = ( long ) ( llSource % NANOSECONDS_PER_SECOND );
+
+    /* Subtract from tv_sec if tv_nsec < 0. */
+    if( pxDestination->tv_nsec < 0L )
+    {
+        /* Compute the number of seconds to carry. */
+        lCarrySec = ( pxDestination->tv_nsec / ( long ) NANOSECONDS_PER_SECOND ) + 1L;
+
+        pxDestination->tv_sec -= ( time_t ) ( lCarrySec );
+        pxDestination->tv_nsec += lCarrySec * ( long ) NANOSECONDS_PER_SECOND;
+    }
+}
+
+int clock_gettime(clockid_t unused, struct timespec *tp)
+{
+
+    ( void ) unused;
+
+    TimeOut_t xCurrentTime = { 0 };
+    uint64_t ullTickCount = 0ULL;
+
+    vTaskSetTimeOutState( &xCurrentTime );
+
+    ullTickCount = ( uint64_t ) ( xCurrentTime.xOverflowCount ) << ( sizeof( TickType_t ) * 8 );
+
+    ullTickCount += xCurrentTime.xTimeOnEntering;
+
+    UTILS_NanosecondsToTimespec( ( int64_t ) ullTickCount * NANOSECONDS_PER_TICK, tp );
+
+    return 0;
+}
+
+// Micro-ROS configuration
 void configure_microros()
 {
 	rmw_uros_set_custom_transport(

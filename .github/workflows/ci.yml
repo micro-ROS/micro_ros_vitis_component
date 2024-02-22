@@ -1,0 +1,39 @@
+name: CI
+
+on:
+  pull_request:
+    branches:
+      - '**'
+  schedule:
+    - cron:  '0 2 * * *'
+
+
+concurrency:
+  group: ${{ github.head_ref }}
+  cancel-in-progress: true
+
+jobs:
+    Build:
+        runs-on: ubuntu-latest
+        image: ubuntu:22.04
+        steps:
+          - name: Checkout
+            uses: actions/checkout@v4
+            with:
+              fetch-depth: 0
+              clean: true
+              path: repo
+
+          - name: Deps
+            run: |
+              apt update
+              apt install -y python3 python3-pip git build-essential cmake rsync
+              pip3 install catkin_pkg lark-parser colcon-common-extensions
+              apt install gcc-arm-none-eabi
+
+          - name: Build
+            run: |
+              cd repo
+              MICROROS_TARGET=GENERIC_ARM ./build_micro_ros_library.sh
+              export TOOLCHAIN_PREFIX=arm-none-eabi-
+              cmake .. -DCMAKE_TOOLCHAIN_FILE=/ws/toolchain.cmake

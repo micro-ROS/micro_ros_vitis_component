@@ -1,0 +1,6 @@
+[submodule ".github/sample_ci_project/thirdparty/freertos"]
+	path = .github/sample_ci_project/thirdparty/freertos
+	url = https://github.com/FreeRTOS/FreeRTOS-Kernel
+[submodule ".github/sample_ci_project/thirdparty/lwip"]
+	path = .github/sample_ci_project/thirdparty/lwip
+	url = https://github.com/lwip-tcpip/lwip

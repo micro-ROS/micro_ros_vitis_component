@@ -1,4 +1,7 @@
-#include <vitis_initialize_microros.h>
+#include <microros_vitis_support.h>
+
+#include <FreeRTOS.h>
+#include <task.h>
 
 #include <stdio.h>
 #include <rcl/rcl.h>
