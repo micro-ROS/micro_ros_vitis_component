@@ -40,10 +40,11 @@ jobs:
           - name: Build
             run: |
               cd repo
+              export REPO_DIR=$(pwd)
               MICROROS_TARGET=GENERIC_ARM ./build_micro_ros_library.sh
               export TOOLCHAIN_PREFIX=arm-none-eabi-
               cd .github/sample_ci_project
               mkdir build
               cd build
-              cmake .. -DCMAKE_TOOLCHAIN_FILE=/ws/toolchain.cmake
+              cmake .. -DCMAKE_TOOLCHAIN_FILE=$REPO_DIR/toolchain.cmake
               make -j$(nproc)
