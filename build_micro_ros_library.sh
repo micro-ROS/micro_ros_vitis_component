@@ -96,7 +96,7 @@ fi
 if [ ! -d "$MICRO_ROS_BUILD_DIR/dev/install" ]; then
     # Install micro-ROS dev environment
     pushd $MICRO_ROS_BUILD_DIR/dev/ > /dev/null
-        colcon build ;
+        colcon build --event-handlers compile_commands- console_stderr-;
     popd > /dev/null
 fi
 
@@ -162,7 +162,7 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/install" ]; then
             --merge-install \
             --packages-ignore-regex=.*_cpp \
             --metas $COLCON_META \
-            --event-handlers compile_commands- \
+            --event-handlers compile_commands- console_stderr- \
             --cmake-args \
             "--no-warn-unused-cli" \
             -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=OFF \
