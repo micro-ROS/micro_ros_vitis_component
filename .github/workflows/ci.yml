@@ -18,6 +18,11 @@ jobs:
         container:
           image: ubuntu:22.04
         steps:
+          - name: Git
+            run: |
+              apt update
+              apt install -y git
+
           - name: Checkout
             uses: actions/checkout@v4
             with:
