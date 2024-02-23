@@ -10,6 +10,33 @@
 # Set compiler flags
 export MICROROS_FLAGS=""
 
+# Iterate over the arguments
+for arg in "$@"
+do
+    case $arg in
+        -f)
+        export FORCE_BUILD=1
+        shift
+        ;;
+        -v)
+        export VERBOSE_BUILD=1
+        shift
+        ;;
+        *)
+        # Unknown option
+        echo "Unknown option: $arg"
+        exit 1
+        ;;
+    esac
+done
+
+# Check if ROS 2 is sourced
+if command -v "ros2" >/dev/null 2>&1
+then
+    echo "ROS 2 sourced, please run this script in a new terminal without sourcing ROS 2"
+    exit
+fi
+
 # Check if MICROROS_TARGET is set
 if [ -z "${MICROROS_TARGET}" ]; then
     echo "MICROROS_TARGET is not set"
@@ -72,8 +99,8 @@ fi
 
 mkdir -p $MICRO_ROS_BUILD_DIR
 
-# If -f option is set, clean $MICRO_ROS_BUILD_DIR directory
-if [ "$1" = "-f" ]; then
+# If FORCE_BUILD clean $MICRO_ROS_BUILD_DIR directory
+if [ -n "${FORCE_BUILD}" ]; then
     rm -rf $MICRO_ROS_BUILD_DIR/*
 fi
 
@@ -92,11 +119,18 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/dev/src" ]; then
     popd > /dev/null
 fi
 
+# Define colcon event handlers depending of VERBOSE_BUILD
+if [ -n "${VERBOSE_BUILD}" ]; then
+    export COLCON_EVENT_HANDLERS="";
+else
+    export COLCON_EVENT_HANDLERS="--event-handlers compile_commands- console_stderr-";
+fi
+
 # If $MICRO_ROS_BUILD_DIR/dev/install exists, skip this
 if [ ! -d "$MICRO_ROS_BUILD_DIR/dev/install" ]; then
     # Install micro-ROS dev environment
     pushd $MICRO_ROS_BUILD_DIR/dev/ > /dev/null
-        colcon build --event-handlers compile_commands- console_stderr-;
+        colcon build $COLCON_EVENT_HANDLERS;
     popd > /dev/null
 fi
 
@@ -162,7 +196,7 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/install" ]; then
             --merge-install \
             --packages-ignore-regex=.*_cpp \
             --metas $COLCON_META \
-            --event-handlers compile_commands- console_stderr- \
+            $COLCON_EVENT_HANDLERS \
             --cmake-args \
             "--no-warn-unused-cli" \
             -DCMAKE_POSITION_INDEPENDENT_CODE:BOOL=OFF \
