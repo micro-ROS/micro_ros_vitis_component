@@ -38,6 +38,11 @@ sudo apt install rsync
 
 ## Building the micro-ROS library
 
+Note - If Vitis SDK environment was sourced, the PATH will need to be adjusted.
+
+```bash
+export PATH="/usr/bin":$PATH
+```
 In order to generate the micro-ROS library for a specific target, the following command must be executed:
 
 ```bash
