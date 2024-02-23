@@ -4,13 +4,12 @@ on:
   pull_request:
     branches:
       - '**'
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "Manual trigger"
   schedule:
     - cron:  '0 2 * * *'
-
-
-concurrency:
-  group: ${{ github.head_ref }}
-  cancel-in-progress: true
 
 jobs:
     Build:
