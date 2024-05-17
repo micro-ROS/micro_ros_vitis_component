@@ -21,7 +21,7 @@ This package eases the integration of [micro-ROS](https://micro.ros.org/) in a [
 | MicroBlaze | `VITIS_MICROBLAZE` |
 | Cortex R5  | `VITIS_CORTEX_R5`  |
 
-### General COnfiguration
+### General Configuration
 
 All targets allow the following CLI arguments:
 
