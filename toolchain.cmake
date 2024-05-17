@@ -13,5 +13,3 @@ set(CMAKE_C_FLAGS_INIT "-std=c11 $ENV{MICROROS_FLAGS} " CACHE STRING "" FORCE)
 set(CMAKE_CXX_FLAGS_INIT "-std=c++14 -fno-rtti $ENV{MICROROS_FLAGS} " CACHE STRING "" FORCE)
 
 add_compile_definitions(CLOCK_MONOTONIC=0)
-
-set(__BIG_ENDIAN__ 0)
