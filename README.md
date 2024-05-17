@@ -7,7 +7,7 @@ This package eases the integration of [micro-ROS](https://micro.ros.org/) in a [
 
 - [micro-ROS for AMD Vitis](#micro-ros-for-amd-vitis)
   - [Supported targets](#supported-targets)
-    - [General COnfiguration](#general-configuration)
+    - [General Configuration](#general-configuration)
     - [MicroBlaze Configuration](#microblaze-configuration)
   - [Prerequisites](#prerequisites)
   - [Building the micro-ROS library](#building-the-micro-ros-library)
