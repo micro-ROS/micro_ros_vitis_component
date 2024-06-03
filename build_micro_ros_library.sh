@@ -180,6 +180,7 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/src" ]; then
         touch src/rclc/rclc_examples/COLCON_IGNORE;
         touch src/rcl/rcl_yaml_param_parser/COLCON_IGNORE;
         touch src/ros2_tracing/test_tracetools/COLCON_IGNORE;
+        touch src/ros2_tracing/lttngpy/COLCON_IGNORE;
 
         # Add extra packages
         cp -rf $MICROROS_EXTRA_PACKAGES src/extra_packages || :;
