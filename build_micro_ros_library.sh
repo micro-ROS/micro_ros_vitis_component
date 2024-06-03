@@ -92,7 +92,7 @@ then
 fi
 
 # Define micro-ROS environment variables
-export MICRO_ROS_DISTRO=iron
+export MICRO_ROS_DISTRO=jazzy
 
 # Set toolchain prefixes
 if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
