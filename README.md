@@ -7,6 +7,8 @@ This package eases the integration of [micro-ROS](https://micro.ros.org/) in a [
 
 - [micro-ROS for AMD Vitis](#micro-ros-for-amd-vitis)
   - [Supported targets](#supported-targets)
+    - [General Configuration](#general-configuration)
+    - [MicroBlaze Configuration](#microblaze-configuration)
   - [Prerequisites](#prerequisites)
   - [Building the micro-ROS library](#building-the-micro-ros-library)
   - [Configuring micro-ROS library memory](#configuring-micro-ros-library-memory)
@@ -14,11 +16,23 @@ This package eases the integration of [micro-ROS](https://micro.ros.org/) in a [
 
 ## Supported targets
 
-| Target             | `MICROROS_TARGET`     |
-| ------------------ | --------------------- |
-| MicroBlaze 32 bits | `VITIS_MICROBLAZE_32` |
-| MicroBlaze 64 bits | `VITIS_MICROBLAZE_64` |
-| Cortex R5          | `VITIS_CORTEX_R5`     |
+| Target     | `MICROROS_TARGET`  |
+| ---------- | ------------------ |
+| MicroBlaze | `VITIS_MICROBLAZE` |
+| Cortex R5  | `VITIS_CORTEX_R5`  |
+
+### General Configuration
+
+All targets allow the following CLI arguments:
+
+- `-f`: Force clean and build, even if the library is already built.
+
+### MicroBlaze Configuration
+
+The MicroBlaze platform allows to configure the following parameters:
+
+- `-mbig-endian`: Enable big-endian mode.
+- `-64bits`: Build for MicroBlaze 64 bits (default is 32 bits).
 
 ## Prerequisites
 

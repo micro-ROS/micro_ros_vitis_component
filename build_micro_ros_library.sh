@@ -2,13 +2,16 @@
 
 # Depending on the MICROROS_TARGET environment variable, this script will build the micro-ROS library for the selected target.
 # The following targets are supported:
-# - VITIS_MICROBLAZE_32
-# - VITIS_MICROBLAZE_64
+# - VITIS_MICROBLAZE
 # - VITIS_CORTEX_R5
 # - GENERIC_ARM
 
 # Set compiler flags
 export MICROROS_FLAGS=""
+
+# MicroBlaze custom flags
+export MICROBLAZE_ENDIANNESS_FLAG="-mlittle-endian"
+export MICROBLAZE_64BITS=""
 
 # Iterate over the arguments
 for arg in "$@"
@@ -20,6 +23,14 @@ do
         ;;
         -v)
         export VERBOSE_BUILD=1
+        shift
+        ;;
+        -bigendiann)
+        export MICROBLAZE_ENDIANNESS_FLAG="-mbig-endian"
+        shift
+        ;;
+        -64bits)
+        export MICROBLAZE_64BITS="-m64"
         shift
         ;;
         *)
@@ -44,20 +55,17 @@ if [ -z "${MICROROS_TARGET}" ]; then
 fi
 
 # Check if MICROROS_TARGET is supported
-if  [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE_32" ] &&
+if  [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE" ] &&
     [ "${MICROROS_TARGET}" != "VITIS_CORTEX_R5" ] &&
-    [ "${MICROROS_TARGET}" != "VITIS_MICROBLAZE_64" ] &&
     [ "${MICROROS_TARGET}" != "GENERIC_ARM" ]; then
     echo "MICROROS_TARGET ${MICROROS_TARGET} is not supported"
     exit
 fi
 
 # Set toolchain prefixes
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
     export TOOLCHAIN_PREFIX=mb-
-elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
-    export TOOLCHAIN_PREFIX=mb-
-    export MICROROS_FLAGS="${MICROROS_FLAGS} -m64"
+    export MICROROS_FLAGS="${MICROROS_FLAGS} ${MICROBLAZE_ENDIANNESS_FLAG} ${MICROBLAZE_64BITS} -fPIC"
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export TOOLCHAIN_PREFIX=armr5-none-eabi-
 elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
@@ -87,10 +95,8 @@ fi
 export MICRO_ROS_DISTRO=iron
 
 # Set toolchain prefixes
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
-    export MICRO_ROS_BUILD_DIR=microros_build_microblaze_32
-elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
-    export MICRO_ROS_BUILD_DIR=microros_build_microblaze_64
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
+    export MICRO_ROS_BUILD_DIR=microros_build_microblaze
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export MICRO_ROS_BUILD_DIR=microros_build_cortex_r5
 elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
@@ -223,10 +229,8 @@ if [ ! -d "$MICRO_ROS_BUILD_DIR/microros/install" ]; then
 fi
 
 # Generate the output folder
-if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_32" ]; then
-    export OUTPUT_FOLDER=microros_microblaze_32_lib
-elif [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE_64" ]; then
-    export OUTPUT_FOLDER=microros_microblaze_64_lib
+if [ "${MICROROS_TARGET}" = "VITIS_MICROBLAZE" ]; then
+    export OUTPUT_FOLDER=microros_microblaze_lib
 elif [ "${MICROROS_TARGET}" = "VITIS_CORTEX_R5" ]; then
     export OUTPUT_FOLDER=microros_cortex_r5_lib
 elif [ "${MICROROS_TARGET}" = "GENERIC_ARM" ]; then
